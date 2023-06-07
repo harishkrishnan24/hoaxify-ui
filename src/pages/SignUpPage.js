@@ -1,51 +1,73 @@
-import { Component } from 'react';
+import axios from "axios";
+import { useState } from "react";
 
-class SignUpPage extends Component {
-  state = {
-    password: '',
-    passwordRepeat: '',
+const SignUpPage = () => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordRepeat, setPasswordRepeat] = useState("");
+
+  const onChangeUsername = (event) => {
+    setUsername(event.target.value);
   };
 
-  onChangePassword = (event) => {
-    const currentValue = event.target.value;
-    this.setState({
-      password: currentValue,
-    });
+  const onChangeEmail = (event) => {
+    setEmail(event.target.value);
   };
 
-  onChangePasswordRepeat = (event) => {
-    const currentValue = event.target.value;
-    this.setState({
-      passwordRepeat: currentValue,
-    });
+  const onChangePassword = (event) => {
+    setPassword(event.target.value);
   };
 
-  render() {
-    let disabled = true;
-    const { password, passwordRepeat } = this.state;
+  const onChangePasswordRepeat = (event) => {
+    setPasswordRepeat(event.target.value);
+  };
 
-    if (password && passwordRepeat) {
-      disabled = password !== passwordRepeat;
-    }
-    return (
-      <div>
+  const submit = (event) => {
+    event.preventDefault();
+    axios.post("/api/1.0/users", { username, email, password });
+  };
+
+  return (
+    <div>
+      <form>
         <h1>Sign Up</h1>
-        <label htmlFor="username">Username</label>
-        <input id="username" />
-        <label htmlFor="email">E-mail</label>
-        <input id="email" />
-        <label htmlFor="password">Password</label>
-        <input id="password" type="password" onChange={this.onChangePassword} />
-        <label htmlFor="passwordRepeat">Password Repeat</label>
+
+        <label htmlFor='username'>Username</label>
         <input
-          id="passwordRepeat"
-          type="password"
-          onChange={this.onChangePasswordRepeat}
+          id='username'
+          onChange={onChangeUsername}
         />
-        <button disabled={disabled}>Sign Up</button>
-      </div>
-    );
-  }
-}
+
+        <label htmlFor='email'>E-mail</label>
+        <input
+          id='email'
+          onChange={onChangeEmail}
+        />
+
+        <label htmlFor='password'>Password</label>
+        <input
+          id='password'
+          type='password'
+          onChange={onChangePassword}
+        />
+
+        <label htmlFor='passwordRepeat'>Password Repeat</label>
+        <input
+          id='passwordRepeat'
+          type='password'
+          onChange={onChangePasswordRepeat}
+        />
+
+        <button
+          disabled={password !== passwordRepeat || !password || !passwordRepeat}
+          onClick={submit}
+        >
+          Sign Up
+        </button>
+      </form>
+    </div>
+  );
+};
 
 export default SignUpPage;
