@@ -1,7 +1,8 @@
 import userEvent from "@testing-library/user-event";
-import axios from "axios";
 import SignUpPage from "./SignUpPage";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import { setupServer } from "msw/node";
+import { rest } from "msw";
 
 describe("Sign Up Page", () => {
   describe("Layout", () => {
@@ -61,17 +62,26 @@ describe("Sign Up Page", () => {
   });
 
   describe("Interactions", () => {
-    it("enables the button when password and password repeat fields have same value", () => {
-      render(<SignUpPage />);
-      const passwordInput = screen.getByLabelText("Password");
-      const passwordRepeatInput = screen.getByLabelText("Password Repeat");
-      userEvent.type(passwordInput, "P4ssword");
-      userEvent.type(passwordRepeatInput, "P4ssword");
-      const button = screen.queryByRole("button", { name: "Sign Up" });
-      expect(button).toBeEnabled();
+    let requestBody;
+    let counter = 0;
+    const server = setupServer(
+      rest.post("/api/1.0/users", (req, res, ctx) => {
+        requestBody = req.body;
+        counter += 1;
+        return res(ctx.status(200));
+      })
+    );
+
+    beforeAll(() => server.listen());
+
+    afterAll(() => server.close());
+
+    beforeEach(() => {
+      counter = 0;
     });
 
-    it("sends username, email and password to backend after clicking sign up button", () => {
+    let button;
+    const setup = () => {
       render(<SignUpPage />);
       const usernameInput = screen.getByLabelText("Username");
       const emailInput = screen.getByLabelText("E-mail");
@@ -81,19 +91,73 @@ describe("Sign Up Page", () => {
       userEvent.type(emailInput, "user1@mail.com");
       userEvent.type(passwordInput, "P4ssword");
       userEvent.type(passwordRepeatInput, "P4ssword");
-      const button = screen.queryByRole("button", { name: "Sign Up" });
+      button = screen.queryByRole("button", { name: "Sign Up" });
+    };
 
-      const mockFn = jest.fn();
-      axios.post = mockFn;
+    it("enables the button when password and password repeat fields have same value", () => {
+      setup();
+      expect(button).toBeEnabled();
+    });
+
+    it("sends username, email and password to backend after clicking sign up button", async () => {
+      setup();
 
       userEvent.click(button);
 
-      const firstCallOfMockFunction = mockFn.mock.calls[0];
-      const body = firstCallOfMockFunction[1];
-      expect(body).toEqual({
+      await screen.findByText(
+        "Please check your e-mail to activate your account"
+      );
+
+      expect(requestBody).toEqual({
         username: "user1",
         email: "user1@mail.com",
         password: "P4ssword",
+      });
+    });
+
+    it("disables button when there is an ongoing api call", async () => {
+      setup();
+
+      userEvent.click(button);
+      userEvent.click(button);
+
+      await screen.findByText(
+        "Please check your e-mail to activate your account"
+      );
+
+      expect(counter).toBe(1);
+    });
+
+    it("displays spinner after clicking the submit", async () => {
+      setup();
+
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
+      userEvent.click(button);
+      const spinner = screen.getByRole("status");
+
+      expect(spinner).toBeInTheDocument();
+      await screen.findByText(
+        "Please check your e-mail to activate your account"
+      );
+    });
+
+    it("displays account activation notification after successful sign up request", async () => {
+      setup();
+      const message = "Please check your e-mail to activate your account";
+      expect(screen.queryByText(message)).not.toBeInTheDocument();
+      userEvent.click(button);
+
+      const text = await screen.findByText(message);
+      expect(text).toBeInTheDocument();
+    });
+
+    it("hides sign up form after successful sign up request", async () => {
+      setup();
+      const form = screen.getByTestId("form-sign-up");
+      userEvent.click(button);
+
+      await waitFor(() => {
+        expect(form).not.toBeInTheDocument();
       });
     });
   });

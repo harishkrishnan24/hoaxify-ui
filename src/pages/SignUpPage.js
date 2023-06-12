@@ -6,6 +6,8 @@ const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordRepeat, setPasswordRepeat] = useState("");
+  const [apiProgress, setApiProgress] = useState(false);
+  const [signUpSuccess, setSignUpSuccess] = useState(false);
 
   const onChangeUsername = (event) => {
     setUsername(event.target.value);
@@ -23,49 +25,110 @@ const SignUpPage = () => {
     setPasswordRepeat(event.target.value);
   };
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
-    axios.post("/api/1.0/users", { username, email, password });
+    setApiProgress(true);
+    try {
+      await axios.post("/api/1.0/users", { username, email, password });
+      setSignUpSuccess(true);
+    } catch (err) {}
   };
 
   return (
-    <div>
-      <form>
-        <h1>Sign Up</h1>
-
-        <label htmlFor='username'>Username</label>
-        <input
-          id='username'
-          onChange={onChangeUsername}
-        />
-
-        <label htmlFor='email'>E-mail</label>
-        <input
-          id='email'
-          onChange={onChangeEmail}
-        />
-
-        <label htmlFor='password'>Password</label>
-        <input
-          id='password'
-          type='password'
-          onChange={onChangePassword}
-        />
-
-        <label htmlFor='passwordRepeat'>Password Repeat</label>
-        <input
-          id='passwordRepeat'
-          type='password'
-          onChange={onChangePasswordRepeat}
-        />
-
-        <button
-          disabled={password !== passwordRepeat || !password || !passwordRepeat}
-          onClick={submit}
+    <div className='col-lg-6 offset-lg-3 col-md-8 offset-md-2'>
+      {!signUpSuccess && (
+        <form
+          className='card mt-5'
+          data-testid='form-sign-up'
         >
-          Sign Up
-        </button>
-      </form>
+          <div className='card-header'>
+            <h1 className='text-center'>Sign Up</h1>
+          </div>
+          <div className='card-body'>
+            <div className='mb-3'>
+              <label
+                htmlFor='username'
+                className='form-label'
+              >
+                Username
+              </label>
+              <input
+                id='username'
+                className='form-control'
+                onChange={onChangeUsername}
+              />
+            </div>
+            <div className='mb-3'>
+              <label
+                htmlFor='email'
+                className='form-label'
+              >
+                E-mail
+              </label>
+              <input
+                id='email'
+                className='form-control'
+                onChange={onChangeEmail}
+              />
+            </div>
+
+            <div className='mb-3'>
+              <label
+                htmlFor='password'
+                className='form-label'
+              >
+                Password
+              </label>
+              <input
+                id='password'
+                className='form-control'
+                type='password'
+                onChange={onChangePassword}
+              />
+            </div>
+
+            <div className='mb-3'>
+              <label
+                htmlFor='passwordRepeat'
+                className='form-label'
+              >
+                Password Repeat
+              </label>
+              <input
+                id='passwordRepeat'
+                className='form-control'
+                type='password'
+                onChange={onChangePasswordRepeat}
+              />
+            </div>
+            <div className='text-center'>
+              <button
+                className='btn btn-primary'
+                disabled={
+                  password !== passwordRepeat ||
+                  !password ||
+                  !passwordRepeat ||
+                  apiProgress
+                }
+                onClick={submit}
+              >
+                {apiProgress && (
+                  <span
+                    className='spinner-border spinner-border-sm'
+                    role='status'
+                  ></span>
+                )}
+                Sign Up
+              </button>
+            </div>
+          </div>
+        </form>
+      )}
+      {signUpSuccess && (
+        <div className='alert alert-success mt-3'>
+          Please check your e-mail to activate your account
+        </div>
+      )}
     </div>
   );
 };
