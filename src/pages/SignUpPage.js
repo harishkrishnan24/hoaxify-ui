@@ -7,6 +7,8 @@ const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordRepeat, setPasswordRepeat] = useState("");
+  const [apiProgress, setApiProgress] = useState(false);
+  const [signUpSuccess, setSignUpSuccess] = useState(false);
 
   const onChangeUsername = (event) => {
     setUsername(event.target.value);
@@ -18,28 +20,39 @@ const SignUpPage = () => {
 
   const onChangePassword = (event) => {
     const currentPassword = event.target.value;
-    setPassword(currentPassword);
-    if (password && passwordRepeat) {
+    if (currentPassword && passwordRepeat) {
       setDisabled(currentPassword !== passwordRepeat);
+    } else {
+      setDisabled(true);
     }
+    setPassword(currentPassword);
   };
 
   const onChangePasswordRepeat = (event) => {
     const currentPasswordRepeat = event.target.value;
-    setPasswordRepeat(currentPasswordRepeat);
-    if (password && passwordRepeat) {
+    if (password && currentPasswordRepeat) {
       setDisabled(currentPasswordRepeat !== password);
+    } else {
+      setDisabled(true);
     }
+    setPasswordRepeat(currentPasswordRepeat);
   };
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
-    axios.post("/api/1.0/users", { username, email, password });
+    setApiProgress(true);
+    try {
+      await axios.post("/api/1.0/users", { username, email, password });
+      setSignUpSuccess(true);
+    } catch (err) {
+    } finally {
+      setApiProgress(false);
+    }
   };
 
   return (
     <div className="col-lg-6 col-md-8 offset-lg-3 offset-md-2">
-      <form className="card mt-5">
+      <form className="card mt-5" onSubmit={onSubmit}>
         <div className="card-header">
           <h1 className="text-center">Sign Up</h1>
         </div>
@@ -90,14 +103,24 @@ const SignUpPage = () => {
           <div className="text-center">
             <button
               className="btn btn-primary"
-              disabled={disabled}
-              onClick={onSubmit}
+              disabled={disabled || apiProgress}
             >
+              {apiProgress && (
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                />
+              )}
               Sign Up
             </button>
           </div>
         </div>
       </form>
+      {signUpSuccess && (
+        <div className="alert alert-success mt-3">
+          Please check your e-mail to activate your account
+        </div>
+      )}
     </div>
   );
 };
