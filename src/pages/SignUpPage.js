@@ -38,24 +38,65 @@ const SignUpPage = () => {
   };
 
   return (
-    <div>
-      <form>
-        <h1>Sign Up</h1>
-        <label htmlFor="username">Username</label>
-        <input id="username" onChange={onChangeUsername} />
-        <label htmlFor="email">E-mail</label>
-        <input id="email" onChange={onChangeEmail} />
-        <label htmlFor="password">Password</label>
-        <input id="password" type="password" onChange={onChangePassword} />
-        <label htmlFor="passwordRepeat">Password Repeat</label>
-        <input
-          id="passwordRepeat"
-          type="password"
-          onChange={onChangePasswordRepeat}
-        />
-        <button disabled={disabled} onClick={onSubmit}>
-          Sign Up
-        </button>
+    <div className="col-lg-6 col-md-8 offset-lg-3 offset-md-2">
+      <form className="card mt-5">
+        <div className="card-header">
+          <h1 className="text-center">Sign Up</h1>
+        </div>
+        <div className="card-body">
+          <div className="mb-3">
+            <label htmlFor="username" className="form-label">
+              Username
+            </label>
+            <input
+              id="username"
+              className="form-control"
+              onChange={onChangeUsername}
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label" htmlFor="email">
+              E-mail
+            </label>
+            <input
+              className="form-control"
+              id="email"
+              onChange={onChangeEmail}
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label" htmlFor="password">
+              Password
+            </label>
+            <input
+              className="form-control"
+              id="password"
+              type="password"
+              onChange={onChangePassword}
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label" htmlFor="passwordRepeat">
+              Password Repeat
+            </label>
+            <input
+              className="form-control"
+              id="passwordRepeat"
+              type="password"
+              onChange={onChangePasswordRepeat}
+            />
+          </div>
+
+          <div className="text-center">
+            <button
+              className="btn btn-primary"
+              disabled={disabled}
+              onClick={onSubmit}
+            >
+              Sign Up
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   );
