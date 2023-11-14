@@ -3,6 +3,10 @@ import SignUpPage from "./SignUpPage";
 import { render, screen, waitFor } from "@testing-library/react";
 import { setupServer } from "msw/node";
 import { rest } from "msw";
+import i18n from "../locale/i18n";
+import en from "../locale/en.json";
+import ta from "../locale/ta.json";
+import LanguageSelector from "../components/LanguageSelector";
 
 describe("Sign Up Page", () => {
   describe("Layout", () => {
@@ -223,5 +227,68 @@ describe("Sign Up Page", () => {
         expect(validationError).not.toBeInTheDocument();
       }
     );
+  });
+
+  describe("Internationalizaiton", () => {
+    const setup = () => {
+      render(
+        <>
+          <SignUpPage />
+          <LanguageSelector />
+        </>
+      );
+    };
+
+    afterEach(() => {
+      i18n.changeLanguage("en");
+    });
+
+    it("initially displays all text in English", () => {
+      setup();
+      expect(
+        screen.getByRole("heading", { name: en.signUp })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: en.signUp })
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText(en.username)).toBeInTheDocument();
+      expect(screen.getByLabelText(en.email)).toBeInTheDocument();
+      expect(screen.getByLabelText(en.password)).toBeInTheDocument();
+      expect(screen.getByLabelText(en.passwordRepeat)).toBeInTheDocument();
+    });
+
+    it("displays all text in Tamil after changing the language", () => {
+      setup();
+      const tamilToggle = screen.getByTitle("தமிழ்");
+      userEvent.click(tamilToggle);
+
+      expect(
+        screen.getByRole("heading", { name: ta.signUp })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: ta.signUp })
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText(ta.username)).toBeInTheDocument();
+      expect(screen.getByLabelText(ta.email)).toBeInTheDocument();
+      expect(screen.getByLabelText(ta.password)).toBeInTheDocument();
+      expect(screen.getByLabelText(ta.passwordRepeat)).toBeInTheDocument();
+    });
+
+    it("displays all text in English after changing back from tamil", () => {
+      setup();
+      const englishToggle = screen.getByTitle("English");
+      userEvent.click(englishToggle);
+
+      expect(
+        screen.getByRole("heading", { name: en.signUp })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: en.signUp })
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText(en.username)).toBeInTheDocument();
+      expect(screen.getByLabelText(en.email)).toBeInTheDocument();
+      expect(screen.getByLabelText(en.password)).toBeInTheDocument();
+      expect(screen.getByLabelText(en.passwordRepeat)).toBeInTheDocument();
+    });
   });
 });

@@ -1,8 +1,10 @@
 import axios from "axios";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import Input from "../components/Input";
 
 const SignUpPage = () => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,31 +55,31 @@ const SignUpPage = () => {
       {!signUpSuccess && (
         <form className="card mt-5" data-testid="form-sign-up">
           <div className="card-header">
-            <h1 className="text-center">Sign Up</h1>
+            <h1 className="text-center">{t("signUp")}</h1>
           </div>
           <div className="card-body">
             <Input
               id="username"
-              label="Username"
+              label={t("username")}
               onChange={onChangeUsername}
               help={errors.username}
             />
             <Input
               id="email"
-              label="E-mail"
+              label={t("email")}
               onChange={onChangeEmail}
               help={errors.email}
             />
             <Input
               id="password"
-              label="Password"
+              label={t("password")}
               type="password"
               onChange={onChangePassword}
               help={errors.password}
             />
             <Input
               id="passwordRepeat"
-              label="Password Repeat"
+              label={t("passwordRepeat")}
               type="password"
               onChange={onChangePasswordRepeat}
               help={password !== passwordRepeat ? "Password mismatch" : ""}
@@ -99,7 +101,7 @@ const SignUpPage = () => {
                     role="status"
                   ></span>
                 )}
-                Sign Up
+                {t("signUp")}
               </button>
             </div>
           </div>

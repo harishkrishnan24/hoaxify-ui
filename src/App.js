@@ -1,9 +1,11 @@
+import LanguageSelector from "./components/LanguageSelector";
 import SignUpPage from "./pages/SignUpPage";
 
 function App() {
   return (
-    <div className='container'>
+    <div className="container">
       <SignUpPage />
+      <LanguageSelector />
     </div>
   );
 }
